@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://bphss1ed1u6hk"]
+
+[ext_resource type="PackedScene" uid="uid://bajtsx782rb0s" path="res://Player/player.tscn" id="1_ys120"]
+
+[node name="Map" type="Node2D"]
+
+[node name="Player" parent="." instance=ExtResource("1_ys120")]
+position = Vector2(560, 254)
+speed = 500.0
