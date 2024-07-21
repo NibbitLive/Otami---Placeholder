@@ -26,3 +26,6 @@ func _process(delta):
 
 	# Move the player
 	move_and_slide()
+
+
+#man
