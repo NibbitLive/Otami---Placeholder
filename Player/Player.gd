@@ -1,6 +1,7 @@
 extends CharacterBody2D
 
-const DECELERATION = 100.0 
+const DECELERATION = 800.0 
+const DASH_DECELERATION = 1500.0  # Greater deceleration when dashing
 
 # Movement speed
 @export var speed = 300.0
@@ -11,6 +12,7 @@ const DECELERATION = 100.0
 @export var dash_cooldown = 1.0
 
 @onready var attack = $Attack
+@onready var animation_player = $Attack  # Reference to the AnimationPlayer node
 
 # Internal state
 var is_dashing = false
@@ -52,18 +54,25 @@ func _process(delta):
 			start_dash(direction)
 		
 		if Input.is_action_just_pressed("attack"):
-			attack.play()
+			play_attack_animation()
 		
 		# Normalize direction to ensure consistent speed in all directions
 		if direction.length() > 0:
 			direction = direction.normalized()
-		
-		# Set the velocity
-		velocity = direction * speed
-		
-		# Adjust speed if moving diagonally
-		if direction.length() != 0:
-			velocity *= 0.7071  # Multiplying by 1/sqrt(2) to ensure consistent speed when moving diagonally
+			velocity = direction * speed
+			# Adjust speed if moving diagonally
+			if direction.length() != 0:
+				velocity *= 0.7071  # Multiplying by 1/sqrt(2) to ensure consistent speed when moving diagonally
+		else:
+			# Apply deceleration
+			if velocity.length() > 0:
+				var decel_amount = DECELERATION * delta
+				if is_dashing:
+					decel_amount = DASH_DECELERATION * delta
+				if velocity.length() < decel_amount:
+					velocity = Vector2.ZERO
+				else:
+					velocity -= velocity.normalized() * decel_amount
 	
 	# Move the player
 	move_and_slide()
@@ -84,3 +93,8 @@ func stop_dash():
 func _on_DashTimer_timeout():
 	# This function is called when the dash cooldown is over
 	pass
+
+# Function to play the attack animation
+func play_attack_animation():
+	if animation_player.has_animation("Torch_attack"):
+		animation_player.play("Torch_attack")
